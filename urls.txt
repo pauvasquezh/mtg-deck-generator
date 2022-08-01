@@ -1,3 +1,0 @@
-/mtg/graded-magic
-/mtg/complete-sets
-/mtg/3rd-edition
