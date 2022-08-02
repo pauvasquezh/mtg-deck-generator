@@ -7,13 +7,15 @@ import json
 with open('config.json', 'r') as config_file:
     contents = json.loads(config_file.read())
     
-def get_soup_from_website(URL):
+def get_soup_from_website(URL, options=False):
     driver = webdriver.Chrome(contents["chrome-driver-location"])
     driver.get(URL)
+    if options:
+        options.add_argument("headless")
     a = driver.page_source
     soup = bs(a, features="html.parser")
-    driver.close()
-    driver.quit()
+    #driver.close()
+    #driver.quit()
     return soup
 
 def get_max_pages(soup):
