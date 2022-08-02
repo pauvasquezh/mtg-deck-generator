@@ -3,20 +3,37 @@ import re
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 import json
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.common.exceptions import NoSuchElementException
 
 with open('config.json', 'r') as config_file:
     contents = json.loads(config_file.read())
     
 def get_soup_from_website(URL, options=False):
-    driver = webdriver.Chrome(contents["chrome-driver-location"])
-    driver.get(URL)
     if options:
-        options.add_argument("headless")
+        opts = webdriver.ChromeOptions()
+        opts = Options()
+        opts.add_argument("user-agent=whatever you want")
+        opts.add_argument("--incognito")
+        driver = webdriver.Chrome(contents["chrome-driver-location"], options=opts)
+        driver.get(URL)
+    else:
+        driver = webdriver.Chrome(contents["chrome-driver-location"])
+        driver.get(URL)
+    driver.get(URL)
     a = driver.page_source
     soup = bs(a, features="html.parser")
     #driver.close()
     #driver.quit()
     return soup
+
+def click_element_in_href(driver, text_element):
+    element = driver.find_element(By.XPATH, f"//a[contains(text(), '{text_element}')]")
+    driver.execute_script('arguments[0].scrollIntoView();', element)
+    driver.execute_script('window.scrollBy(0, -200);')
+    element.click()
 
 def get_max_pages(soup):
     max_pages = list()
@@ -121,3 +138,23 @@ def get_card_text(soup_):
                         element = element.replace("\n", "")      
                         text_list.append(element)
         return text_list
+
+def check_exists_by_xpath(driver, xpath):
+    try:
+        driver.find_element(By.XPATH, xpath)
+    except NoSuchElementException:
+        return False
+    return True
+
+def check_exists_by_css_selector(driver, selector):
+    try:
+        driver.find_element(By.CSS_SELECTOR, selector)
+    except NoSuchElementException:
+        return False
+    return True
+
+def click_button(driver, selector):
+    element = driver.find_element(By.CSS_SELECTOR, selector)
+    driver.execute_script('arguments[0].scrollIntoView();', element)
+    driver.execute_script('window.scrollBy(0, -200);')
+    element.click()
