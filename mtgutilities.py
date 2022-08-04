@@ -15,14 +15,12 @@ def get_soup_from_website(URL, options=False):
     if options:
         opts = webdriver.ChromeOptions()
         opts = Options()
-        opts.add_argument("user-agent=whatever you want")
         opts.add_argument("--incognito")
         driver = webdriver.Chrome(contents["chrome-driver-location"], options=opts)
         driver.get(URL)
     else:
         driver = webdriver.Chrome(contents["chrome-driver-location"])
         driver.get(URL)
-    driver.get(URL)
     a = driver.page_source
     soup = bs(a, features="html.parser")
     #driver.close()
