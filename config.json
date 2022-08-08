@@ -1,5 +1,6 @@
 {
     "chrome-driver-location": "/Users/gatito/mtg-deck-generator/chromedriver",
     "main-URL": "https://www.cardkingdom.com/",
-    "card-folder": "cards"
+    "card-folder": "cards",
+    "external-drive-location": "/Volumes/TOSHIBA EXT/projects/mtg-deck-builder/data"
 }

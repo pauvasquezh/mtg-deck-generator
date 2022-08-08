@@ -54,7 +54,7 @@ def get_card_urls(soup_, expansion_key):
         for c in soup_.find_all('a', href=True):
                 if f"/mtg/{expansion_key}/" in c["href"]:
                     if c.string != "Singles" and c.string != "About" and c.string != "Foils" and c.string != "Sealed" and c["href"]:
-                        urls.append(c["href"])
+                        urls.append(f"{contents['main-URL'][:-1]}{c['href']}")
         [card_urls.append(i) for i in urls if i not in card_urls]
         return card_urls
 
@@ -136,6 +136,16 @@ def get_card_text(soup_):
                         element = element.replace("\n", "")      
                         text_list.append(element)
         return text_list
+
+def get_card_price(soup_):
+        price_list = []
+        i=0
+        for d in soup_.find_all('li'):
+            if 'itemAddToCart' in str(d) and 'active' in str(d):
+                for e in d.find_all("input"):
+                        if "price" in str(e):
+                                price_list.append(float(e.get('value')))
+        return price_list
 
 def check_exists_by_xpath(driver, xpath):
     try:
