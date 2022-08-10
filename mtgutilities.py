@@ -139,11 +139,10 @@ def get_card_text(soup_):
 
 def get_card_price(soup_):
         price_list = []
-        i=0
         for d in soup_.find_all('li'):
-            if 'itemAddToCart' in str(d) and 'active' in str(d):
+            if 'itemAddToCart' in str(d) and 'NM' in str(d):
                 for e in d.find_all("input"):
-                        if "price" in str(e):
+                        if '"price"' in str(e):
                                 price_list.append(float(e.get('value')))
         return price_list
 
