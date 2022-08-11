@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException
+import time
 
 with open('config.json', 'r') as config_file:
     contents = json.loads(config_file.read())
@@ -36,17 +37,16 @@ def click_element_in_href(driver, text_element):
 def get_max_pages(soup):
     max_pages = list()
     for b in soup.find_all('a', href=True):
-            try:
-                if "?page=" in b['href']:
-                    match = re.search('\d{1,3}$', b['href'])
-                    max_pages.append(int(match.group(0)))
-            except:
+        try:
+            if "?page=" in b['href']:
+                match = re.search('\d{1,3}$', b['href'])
+                max_pages.append(int(match))
+        except:
                 max_pages.append(0)
     if len(max_pages) > 1:
-        max_pages = max(max_pages)
+        return max(max_pages)
     else:
-        max_pages = 1
-    return max_pages
+        return 1
 
 def get_card_urls(soup_, expansion_key):
         urls = list()
@@ -165,3 +165,34 @@ def click_button(driver, selector):
     driver.execute_script('arguments[0].scrollIntoView();', element)
     driver.execute_script('window.scrollBy(0, -200);')
     element.click()
+
+
+def get_color_commanders(colors):
+    commanders = dict()
+    for color in colors:
+        # Enter each commander color site, click Text View
+        chrome_options = webdriver.ChromeOptions()
+        opts = Options()
+        opts.add_argument("--incognito")
+        driver = webdriver.Chrome(contents["chrome-driver-location"], options=opts)
+        driver.get(color)
+        click_element_in_href(driver, 'Text View')
+        time.sleep(2)
+
+        # Clicking Read More to reveal all commanders
+        elements = driver.find_elements(By.CSS_SELECTOR, "button.btn.btn-primary")
+        while len(elements)>1:
+            try:
+                element = driver.find_elements(By.CSS_SELECTOR, "button.btn.btn-primary")[1]
+                element.click()
+                time.sleep(2)
+            except IndexError:
+                break
+        
+        # Scraping Commander names
+        a = driver.page_source
+        soup = bs(a, features="html.parser")
+        commander_list = [c['href'][1:] for c in soup.find_all('a', href=True) if f"/commanders/" in c["href"] and "edhrec" not in c["href"]]
+        commanders[color] = commander_list
+    return commanders
+
